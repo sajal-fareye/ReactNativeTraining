@@ -46,8 +46,11 @@ const App = () => {
         component={SignIn}
         options={{headerShown:false}}
       />
+   
+      
       <Stack.Screen name="Sign Up" component={SignUp} options={{headerShown:false}} />
-    </Stack.Navigator>
+      </Stack.Navigator>
+      
   </NavigationContainer>
 
   );

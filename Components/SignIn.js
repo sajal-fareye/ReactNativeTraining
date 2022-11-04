@@ -9,9 +9,10 @@ const SignIn = ({ navigation }) => {
     const [rightIcon, setRightIcon] = useState('eye');
     const [emailValid, setEmailValid] = useState('');
     const[passwordValid,setPasswordValid] = useState('');
+    const[hideshowText,setHideshowText]=useState('Show')
 
 
-    ValidEmail = (text) => {
+    const ValidEmail = (text) => {
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
 
         if (text.length === 0) {
@@ -26,7 +27,7 @@ const SignIn = ({ navigation }) => {
         }
     }
 
-    ValidPassword = (text) => {
+    const ValidPassword = (text) => {
         let reg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,16}$/;
 
         if (text.length === 0) {
@@ -37,7 +38,18 @@ const SignIn = ({ navigation }) => {
             setPasswordValid('');
         }
         else {
-            setPasswordValid('Enter Valid Password');
+            setPasswordValid('Password must contain Capitol,Number and Special character. Length:(8 to 16) ');
+        }
+    }
+
+    const onpressHideShow=()=>{
+        if(passwordVisibility===true){
+            setHideshowText('Hide');
+            setPasswordVisibility(false);
+        }
+        else{
+            setHideshowText('Show');
+            setPasswordVisibility(true);
         }
     }
 
@@ -69,18 +81,32 @@ const SignIn = ({ navigation }) => {
                         }}
                         value={email}
                         placeholder="Your Email"
+                        keyboardType="email-address"
+                        // maxLength={35}
                     />
                     {emailValid ? <Text style={styles.validText}>{emailValid}</Text>: null}
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={(value) => {
-                            onChangePassword(value)
-                            ValidPassword(value)
-                        }}
-                        value={password}
-                        placeholder="Your Password"
-                        secureTextEntry={passwordVisibility}
-                    />
+
+                    <View style={styles.hideShow}>
+                                <TextInput
+                                    style={styles.hideShowInput}
+                                    onChangeText={(value) => {
+                                        onChangePassword(value)
+                                        ValidPassword(value)
+                                    }}
+                                    value={password}
+                                    placeholder="Your Password"
+                                    secureTextEntry={passwordVisibility}
+                                    
+                                />
+                                <TouchableOpacity style={styles.hideShowButton}
+                                onPress={onpressHideShow}
+                                >
+                                    <Text style={styles.hideShowButtonText}>{hideshowText}</Text>
+                                    
+                                </TouchableOpacity>
+
+                            </View>
+
                     {passwordValid ? <Text style={styles.validText}>{passwordValid}</Text>: null}
 
                     <View style={styles.button}>
@@ -112,8 +138,28 @@ const styles = StyleSheet.create({
         height: 40,
         margin: 12,
         padding: 10,
-        // borderBottomWidth:.5,
-        // borderBottomColor:"#000000",
+        borderBottomWidth: 1,
+        borderBottomColor: "grey",
+    },
+    hideShowInput: {
+        height: 40,
+        margin: 12,
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: "grey",
+        width: "80%",
+        marginRight:0,
+    },
+    hideShowButton:{
+        height: 40,
+        marginTop: 12,
+        marginBottom:12,
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: "grey",
+        marginLeft:0,
+        marginRight:12,
+        width:"15%",
     },
     titleText: {
         fontFamily: "Cochin",
@@ -154,7 +200,7 @@ const styles = StyleSheet.create({
         borderTopEndRadius: 30,
         borderTopStartRadius: 30,
         borderColor: "000000",
-        marginTop: 100,
+        marginTop: 160,
         height: '100%'
     },
     appView: {
@@ -176,6 +222,12 @@ const styles = StyleSheet.create({
     },
     validText:{
         color:'#e55937',
+        marginLeft:15,
+    },
+    hideShow: {
+        display: "flex",
+        flexDirection: "row",
+        width:"100%"
     },
 
 
