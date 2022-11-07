@@ -12,6 +12,8 @@ import {
 } from "react-native";
 
 import DatePicker from 'react-native-date-picker'
+import { insertNewTodo, queryAllTodosStatusFalse,queryAllTodosStatusTrue } from "./Schema/Index";
+
 
 
 
@@ -22,20 +24,21 @@ const AddTodo = ({ navigation, route }) => {
 
     const [date, setDate] = useState(new Date())
     const [open, setOpen] = useState(false)
-    const [currentDate, setCurrentDate] = useState('');
+    // const [currentDate, setCurrentDate] = useState('');
     const [status,setStatus] = useState('Working')
+    const[category,setCategory] = useState('false')
     const { email } = route.params
 
 
-    useEffect(() => {
-        var day = new Date(date).getDate(); //Current Date
-        var month = new Date(date).getMonth() + 1; //Current Month
-        var year = new Date(date).getFullYear(); //Current Year
-        setCurrentDate(
-            day + '/' + month + '/' + year
+    // useEffect(() => {
+    //     var day = new Date(date).getDate(); //Current Date
+    //     var month = new Date(date).getMonth() + 1; //Current Month
+    //     var year = new Date(date).getFullYear(); //Current Year
+    //     setCurrentDate(
+    //         day + '/' + month + '/' + year
 
-        );
-    }, [date]);
+    //     );
+    // }, [date]);
 
     const handleStatus = ()=>{
         if(status==='Working'){
@@ -49,36 +52,55 @@ const AddTodo = ({ navigation, route }) => {
     const handleSubmitTodo = async () => {
 
         if (todoContent.length === 0) {
-            alert('Todo Content is Empty')
-        }
-        else {
-            console.log("submitting todo");
-            try {
-                const details = {
-                    body: todoContent,
-                    deadline: currentDate,
-                    status: status
-                }
-                const temp = await AsyncStorage.getItem(email)
-                var userData;
-                if (temp != null) {
-                    userData = JSON.parse(temp);
-                } else {
-                    userData = []
-                }
-                userData.push(details);
-
-                await AsyncStorage.setItem(
-                    email, JSON.stringify(userData)
-                );
-
-                console.log(await AsyncStorage.getItem(email))
-
-            } catch (error) {
-                console.log(error);
+                alert('Todo Content is Empty')
             }
-            navigation.navigate('TodoList', { email })
+        else{
+            console.log("Submitting todos");
+            insertNewTodo({
+                body:todoContent,
+                expiry: date.toString(),
+                category:status,
+                status: category,
+            }).then(resp=>{
+                console.log(resp);
+                queryAllTodosStatusFalse().then(resp=>console.log(resp));
+                navigation.navigate('TodoList',{email})
+            }).catch(err=>{
+                console.log("Error",err)
+            })
         }
+        
+        // if (todoContent.length === 0) {
+        //     alert('Todo Content is Empty')
+        // }
+        // else {
+        //     console.log("submitting todo");
+        //     try {
+        //         const details = {
+        //             body: todoContent,
+        //             deadline: currentDate,
+        //             status: status
+        //         }
+        //         const temp = await AsyncStorage.getItem(email)
+        //         var userData;
+        //         if (temp != null) {
+        //             userData = JSON.parse(temp);
+        //         } else {
+        //             userData = []
+        //         }
+        //         userData.push(details);
+
+        //         await AsyncStorage.setItem(
+        //             email, JSON.stringify(userData)
+        //         );
+
+        //         console.log(await AsyncStorage.getItem(email))
+
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        //     navigation.navigate('TodoList', { email })
+        // }
     }
     const back = () => {
         console.log("back");
