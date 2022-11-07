@@ -67,9 +67,9 @@ const SignUp = ({ navigation }) => {
 
 
     return (
-        <ScrollView>
-            <KeyboardAvoidingView>
-                <SafeAreaView>
+        <ScrollView contentContainerStyle={{ flex: 1 }}>
+            <KeyboardAvoidingView style={{ flex: 1 }}>
+                <SafeAreaView style={{ flex: 1 }}>
 
                     <View style={styles.appView}>
                         <Text style={styles.appViewTitle}>

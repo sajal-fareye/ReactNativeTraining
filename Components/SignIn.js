@@ -3,13 +3,12 @@ import { SafeAreaView, TextInput, StyleSheet, View, Button, Text, TouchableOpaci
 
 const SignIn = ({ navigation }) => {
 
-    const [email, onChangeEmail] = useState(null);
-    const [password, onChangePassword] = useState(null);
+    const [email, onChangeEmail] = useState('');
+    const [password, onChangePassword] = useState('');
     const [passwordVisibility, setPasswordVisibility] = useState(true);
-    const [rightIcon, setRightIcon] = useState('eye');
     const [emailValid, setEmailValid] = useState('');
-    const[passwordValid,setPasswordValid] = useState('');
-    const[hideshowText,setHideshowText]=useState('Show')
+    const [passwordValid, setPasswordValid] = useState('');
+    const [hideshowText, setHideshowText] = useState('Show')
 
 
     const ValidEmail = (text) => {
@@ -42,15 +41,54 @@ const SignIn = ({ navigation }) => {
         }
     }
 
-    const onpressHideShow=()=>{
-        if(passwordVisibility===true){
+    const onpressHideShow = () => {
+        if (passwordVisibility === true) {
             setHideshowText('Hide');
             setPasswordVisibility(false);
         }
-        else{
+        else {
             setHideshowText('Show');
             setPasswordVisibility(true);
         }
+    }
+
+    const postDatatoServer = (bodyFormData, myHeader) => {
+
+        console.log("Data:", bodyFormData);
+        console.log("Header:", myHeader);
+
+        fetch("http://10.0.2.2:8082/login", {
+            method: 'post',
+            body: bodyFormData,
+            headers: myHeader,
+        })
+            .then((response) => {
+
+                console.log("Is it working!!!")
+                console.log(response);
+                if (response.status === 200) {
+                    navigation.navigate('TodoList', { email })
+                }
+            })
+            .catch((error) => {
+
+                console.log("Error", error);
+            });
+
+    }
+
+    const handleSumbit = async () => {
+
+
+        var bodyFormData = new FormData();
+
+        bodyFormData.append('username', email);
+        bodyFormData.append('password', password);
+        var myHeader = new Headers();
+        myHeader.append("Content-Type", "multipart/form-data");
+
+        postDatatoServer(bodyFormData, myHeader);
+
     }
 
     return (
@@ -72,7 +110,7 @@ const SignIn = ({ navigation }) => {
                         </Text>
                     </View>
 
-                    
+
                     <TextInput
                         style={styles.input}
                         onChangeText={(value) => {
@@ -82,39 +120,42 @@ const SignIn = ({ navigation }) => {
                         value={email}
                         placeholder="Your Email"
                         keyboardType="email-address"
-                        // maxLength={35}
+                    // maxLength={35}
                     />
-                    {emailValid ? <Text style={styles.validText}>{emailValid}</Text>: null}
+                    {emailValid ? <Text style={styles.validText}>{emailValid}</Text> : null}
 
                     <View style={styles.hideShow}>
-                                <TextInput
-                                    style={styles.hideShowInput}
-                                    onChangeText={(value) => {
-                                        onChangePassword(value)
-                                        ValidPassword(value)
-                                    }}
-                                    value={password}
-                                    placeholder="Your Password"
-                                    secureTextEntry={passwordVisibility}
-                                    
-                                />
-                                <TouchableOpacity style={styles.hideShowButton}
-                                onPress={onpressHideShow}
-                                >
-                                    <Text style={styles.hideShowButtonText}>{hideshowText}</Text>
-                                    
-                                </TouchableOpacity>
+                        <TextInput
+                            style={styles.hideShowInput}
+                            onChangeText={(value) => {
+                                onChangePassword(value)
+                                ValidPassword(value)
+                            }}
+                            value={password}
+                            placeholder="Your Password"
+                            secureTextEntry={passwordVisibility}
 
-                            </View>
+                        />
+                        <TouchableOpacity style={styles.hideShowButton}
+                            onPress={onpressHideShow}
+                        >
+                            <Text style={styles.hideShowButtonText}>{hideshowText}</Text>
 
-                    {passwordValid ? <Text style={styles.validText}>{passwordValid}</Text>: null}
+                        </TouchableOpacity>
 
-                    <View style={styles.button}>
-                        <TouchableOpacity style={styles.buttonIn}>
+                    </View>
+
+                    {passwordValid ? <Text style={styles.validText}>{passwordValid}</Text> : null}
+
+                    <View style={styles.button}
+                    >
+                        <TouchableOpacity style={styles.buttonIn}
+                            onPress={() => {
+                                handleSumbit()
+                            }}>
                             <Text style={styles.buttonInText}>Sign In</Text>
                         </TouchableOpacity>
                     </View>
-
 
                     <View style={styles.viewLink}>
                         <Text style={styles.viewTextLink}>
@@ -148,18 +189,18 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: "grey",
         width: "80%",
-        marginRight:0,
+        marginRight: 0,
     },
-    hideShowButton:{
+    hideShowButton: {
         height: 40,
         marginTop: 12,
-        marginBottom:12,
+        marginBottom: 12,
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: "grey",
-        marginLeft:0,
-        marginRight:12,
-        width:"15%",
+        marginLeft: 0,
+        marginRight: 12,
+        width: "15%",
     },
     titleText: {
         fontFamily: "Cochin",
@@ -220,17 +261,15 @@ const styles = StyleSheet.create({
     validEmail: {
         alignItems: "center",
     },
-    validText:{
-        color:'#e55937',
-        marginLeft:15,
+    validText: {
+        color: '#e55937',
+        marginLeft: 15,
     },
     hideShow: {
         display: "flex",
         flexDirection: "row",
-        width:"100%"
+        width: "100%"
     },
-
-
 });
 
 export default SignIn;

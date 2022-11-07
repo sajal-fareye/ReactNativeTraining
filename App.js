@@ -9,8 +9,11 @@
 import * as React from 'react';
 import SignIn from './Components/SignIn';
 import SignUp from './Components/SignUp';
+import AddTodo from './Components/AddTodo';
+import TodoList from './Components/TodoList';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 
 import {
   SafeAreaView,
@@ -49,6 +52,8 @@ const App = () => {
    
       
       <Stack.Screen name="Sign Up" component={SignUp} options={{headerShown:false}} />
+      <Stack.Screen name="AddTodo" component={AddTodo} options={{headerShown:false}} />
+      <Stack.Screen name="TodoList" component={TodoList} options={{headerShown:false}} />
       </Stack.Navigator>
       
   </NavigationContainer>
