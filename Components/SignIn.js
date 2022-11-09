@@ -1,10 +1,31 @@
-import React, { useState } from "react";
-import { SafeAreaView, TextInput, StyleSheet, View, Button, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { SafeAreaView, TextInput, StyleSheet, View, Button, Text, TouchableOpacity, AsyncStorage } from "react-native";
+
+
 
 const SignIn = ({ navigation }) => {
 
+
+    async function TodoScreen() {
+        const temp = await AsyncStorage.getItem("userDetails")
+        console.log("Temp",temp)
+        if (temp !== null) {
+            userData = JSON.parse(temp);
+            handleSumbit(userData.email, userData.password);
+        }
+    }
+
     const [email, onChangeEmail] = useState('');
     const [password, onChangePassword] = useState('');
+
+    useEffect(() => {
+
+        TodoScreen();
+        // navigation.navigate('TodoList',{email})
+
+    }, [])
+
+
     const [passwordVisibility, setPasswordVisibility] = useState(true);
     const [emailValid, setEmailValid] = useState('');
     const [passwordValid, setPasswordValid] = useState('');
@@ -52,7 +73,35 @@ const SignIn = ({ navigation }) => {
         }
     }
 
-    const postDatatoServer = (bodyFormData, myHeader) => {
+    const addingUser = async () => {
+        const temp = await AsyncStorage.getItem("userDetails")
+        console.log("Adding TEmp check",temp);
+         if (temp === null) {
+            try {
+                // const details = {
+                //     email: email,
+                //     password: password,
+                // }
+                // const temp = await AsyncStorage.getItem("userDetails")
+                // var userData;
+                // if (temp != null) {
+                //     userData = JSON.parse(temp);
+                // } else {
+                // userData = []
+                // }
+                userData = { email: email, password: password }
+
+                AsyncStorage.setItem('userDetails', JSON.stringify(userData))
+
+                console.log("Console storage",await AsyncStorage.getItem('userDetails'))
+
+            } catch (error) {
+                console.log(error);
+            }
+         }
+    }
+
+    const postDatatoServer = (bodyFormData, myHeader, useremail) => {
 
         console.log("Data:", bodyFormData);
         console.log("Header:", myHeader);
@@ -67,7 +116,10 @@ const SignIn = ({ navigation }) => {
                 console.log("Is it working!!!")
                 console.log(response);
                 if (response.status === 200) {
-                    navigation.navigate('TodoList', { email })
+                    addingUser()
+                    navigation.navigate('TodoList', { useremail })
+                    onChangeEmail('');
+                    onChangePassword('');
                 }
             })
             .catch((error) => {
@@ -77,17 +129,17 @@ const SignIn = ({ navigation }) => {
 
     }
 
-    const handleSumbit = async () => {
+    const handleSumbit = async (useremail, userpassword) => {
 
 
         var bodyFormData = new FormData();
 
-        bodyFormData.append('username', email);
-        bodyFormData.append('password', password);
+        bodyFormData.append('username', useremail);
+        bodyFormData.append('password', userpassword);
         var myHeader = new Headers();
         myHeader.append("Content-Type", "multipart/form-data");
 
-        postDatatoServer(bodyFormData, myHeader);
+        postDatatoServer(bodyFormData, myHeader, useremail);
 
     }
 
@@ -122,7 +174,7 @@ const SignIn = ({ navigation }) => {
                         keyboardType="email-address"
                     // maxLength={35}
                     />
-                    {emailValid ? <Text style={styles.validText}>{emailValid}</Text> : null}
+                    {/* {emailValid ? <Text style={styles.validText}>{emailValid}</Text> : null} */}
 
                     <View style={styles.hideShow}>
                         <TextInput
@@ -145,13 +197,13 @@ const SignIn = ({ navigation }) => {
 
                     </View>
 
-                    {passwordValid ? <Text style={styles.validText}>{passwordValid}</Text> : null}
+                    {/* {passwordValid ? <Text style={styles.validText}>{passwordValid}</Text> : null} */}
 
                     <View style={styles.button}
                     >
                         <TouchableOpacity style={styles.buttonIn}
                             onPress={() => {
-                                handleSumbit()
+                                handleSumbit(email, password)
                             }}>
                             <Text style={styles.buttonInText}>Sign In</Text>
                         </TouchableOpacity>

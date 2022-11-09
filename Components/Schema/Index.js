@@ -1,6 +1,6 @@
 import Realm from "realm";
 
-export const TODO_SCHEMA = "Tasks1";
+export const TODO_SCHEMA = "Tasks2";
 
 const TodoSchema = {
     name: TODO_SCHEMA,
@@ -10,6 +10,7 @@ const TodoSchema = {
       expiry: "string",
       category:"string",
       status:"string?",
+      user:"string",
     },
     primaryKey: "body",
 };
@@ -30,9 +31,10 @@ export const insertNewTodo = newTodo => new Promise((resolve, reject) => {
     })
 })
 
-export const queryAllTodosStatusFalse = () => new Promise((resolve, reject) => {
+export const queryAllTodosStatusFalse = (username) => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then(realm => {
-        let allTodos = realm.objects(TODO_SCHEMA).filtered("status=='false'")
+        let allTodos = realm.objects(TODO_SCHEMA).filtered("status=='false'").filtered(`user=='${username}'`)
+
         // console.log(allTodos);
         resolve(allTodos);
     }).catch(error => {
@@ -40,9 +42,9 @@ export const queryAllTodosStatusFalse = () => new Promise((resolve, reject) => {
     })
 })
 
-export const queryAllTodosStatusTrue = () => new Promise((resolve, reject) => {
+export const queryAllTodosStatusTrue = (username) => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then(realm => {
-        let allTodos = realm.objects(TODO_SCHEMA).filtered("status=='true'")
+        let allTodos = realm.objects(TODO_SCHEMA).filtered("status=='true'").filtered(`user=='${username}'`)
         // console.log(allTodos);
         resolve(allTodos);
     }).catch(error => {
@@ -50,9 +52,9 @@ export const queryAllTodosStatusTrue = () => new Promise((resolve, reject) => {
     })
 })
 
-export const queryAllTodos = () => new Promise((resolve, reject) => {
+export const queryAllTodos = (username) => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then(realm => {
-        let allTodos = realm.objects(TODO_SCHEMA)
+        let allTodos = realm.objects(TODO_SCHEMA).filtered(`user=='${username}'`)
         // console.log(allTodos);
         resolve(allTodos);
     }).catch(error => {
@@ -76,7 +78,7 @@ export const updateTodos = (mytodo) => new Promise((resolve, reject) => {
             mytodo.status = JSON.stringify(!JSON.parse(mytodo.status))
         })
         
-        resolve(allTodos);
+        resolve(mytodo);
     }).catch(error => {
         reject(error);
     })

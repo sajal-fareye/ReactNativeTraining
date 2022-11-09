@@ -27,7 +27,7 @@ const AddTodo = ({ navigation, route }) => {
     // const [currentDate, setCurrentDate] = useState('');
     const [status,setStatus] = useState('Working')
     const[category,setCategory] = useState('false')
-    const { email } = route.params
+    const { useremail } = route.params
 
 
     // useEffect(() => {
@@ -61,10 +61,11 @@ const AddTodo = ({ navigation, route }) => {
                 expiry: date.toString(),
                 category:status,
                 status: category,
+                user:useremail,
             }).then(resp=>{
                 console.log(resp);
-                queryAllTodosStatusFalse().then(resp=>console.log(resp));
-                navigation.navigate('TodoList',{email})
+                queryAllTodosStatusFalse(useremail).then(resp=>console.log(resp));
+                navigation.navigate('TodoList',{useremail})
             }).catch(err=>{
                 console.log("Error",err)
             })
@@ -81,7 +82,7 @@ const AddTodo = ({ navigation, route }) => {
         //             deadline: currentDate,
         //             status: status
         //         }
-        //         const temp = await AsyncStorage.getItem(email)
+        //         const temp = await AsyncStorage.getItem(useremail)
         //         var userData;
         //         if (temp != null) {
         //             userData = JSON.parse(temp);
@@ -91,15 +92,15 @@ const AddTodo = ({ navigation, route }) => {
         //         userData.push(details);
 
         //         await AsyncStorage.setItem(
-        //             email, JSON.stringify(userData)
+        //             useremail, JSON.stringify(userData)
         //         );
 
-        //         console.log(await AsyncStorage.getItem(email))
+        //         console.log(await AsyncStorage.getItem(useremail))
 
         //     } catch (error) {
         //         console.log(error);
         //     }
-        //     navigation.navigate('TodoList', { email })
+        //     navigation.navigate('TodoList', { useremail })
         // }
     }
     const back = () => {
@@ -145,7 +146,7 @@ const AddTodo = ({ navigation, route }) => {
 
                             <DatePicker
                                 modal
-                                mode="date"
+                                // mode="date"
                                 open={open}
                                 date={date}
                                 minimumDate={new Date()}
@@ -181,7 +182,7 @@ const AddTodo = ({ navigation, route }) => {
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => {
-                                navigation.navigate('TodoList', { email })
+                                navigation.navigate('TodoList', { useremail })
                             }}
                         >
                             <Text style={styles.buttonText}>Go Back</Text>

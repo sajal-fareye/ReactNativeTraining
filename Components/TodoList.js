@@ -5,57 +5,52 @@ import {
     View,
     Text,
     TouchableOpacity,
-    ScrollView,
-    KeyboardAvoidingView,
     AsyncStorage,
     FlatList,
     Image
 } from "react-native";
 import { queryAllTodosStatusFalse, queryAllTodosStatusTrue, updateTodos } from "./Schema/Index";
-// import Todo from "./Todo";
-
-
 
 
 const TodoList = ({ navigation, route }) => {
 
     const [todos, setTodos] = useState([]);
     const [pending, setPending] = useState(true);
-    const { email } = route.params;
+    const { useremail } = route.params;
 
-    const getTodo = async () => {
-        if (pending === true) {
-            setTodos(await queryAllTodosStatusFalse());
+    const getTodo = async (temp) => {
+        if (temp===true) {
+            setTodos(await queryAllTodosStatusFalse(useremail));
         }
         else {
-            setTodos(await queryAllTodosStatusTrue())
+            setTodos(await queryAllTodosStatusTrue(useremail))
         }
 
     }
 
     useEffect(() => {
 
-        getTodo();
+        getTodo(true);
 
     }, [])
 
-    const Item = ({ title }) => (
-        <View style={styles.item}>
-          <Text style={styles.title}>{title}</Text>
-        </View>
-      );
+    const Logout=async()=>{
+        // AsyncStorage.removeItem('userDetails')
+        AsyncStorage.clear();
+        navigation.navigate("Sign In")
+    }
 
-      const Todo = ({ todo }) => {
+    const Todo = ({ todo }) => {
 
         return (
             <TouchableOpacity style={styles.todoContainer}
-            onPress={() => {
-                updateTodos(todo);
-                console.log(todo);
-                getTodo()
-            }}
+                onPress={() => {
+                    updateTodos(todo);
+                    console.log(todo);
+                    getTodo(pending)
+                }}
             >
-    
+
                 {
                     todo.category === 'Working' ?
                         <Image
@@ -82,7 +77,7 @@ const TodoList = ({ navigation, route }) => {
 
     const renderItem = ({ item }) => (
         <Todo todo={item} />
-      );
+    );
 
     return (
 
@@ -90,15 +85,24 @@ const TodoList = ({ navigation, route }) => {
 
             <View style={styles.header}>
 
-                <Text style={styles.headerUsernameText}>{email}</Text>
+                <View style={styles.headerUserContain}>
+                <Text style={styles.headerUsernameText}>{useremail}</Text>
+                </View>
 
                 <TouchableOpacity style={styles.headerAddButton}
                     onPress={() => {
-                        navigation.navigate('AddTodo', { email })
+                        navigation.navigate('AddTodo', { useremail })
                     }}
                 >
                     <Text style={styles.headerAddButtonText}>+</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.headerUserContain}
+                    onPress={()=>{
+                        Logout();
+                    }}>
+                    <Text style={styles.headerUsernameText}>Logout</Text>
+                    </TouchableOpacity>
             </View>
 
             <SafeAreaView style={styles.bodyContainer} >
@@ -115,21 +119,21 @@ const TodoList = ({ navigation, route }) => {
                     <View style={styles.listSorting}>
 
                         <TouchableOpacity style={styles.listSortingButton}
-                            onPress={() => {
+                            onPress={async() => {
+                                getTodo(true);
                                 setPending(true)
-                                getTodo();
                             }}
                         >
-                            <Text style={styles.listSortingButtonText}>Pending</Text>
+                            <Text style={(pending===true)?styles.listSortingButtonTextLeft:styles.listSortingButtonTextRight}>Pending</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.listSortingButton}
-                            onPress={() => {
+                            onPress={() => { 
+                                getTodo(false);
                                 setPending(false)
-                                getTodo();
                             }}
                         >
-                            <Text style={styles.listSortingButtonText}>Completed</Text>
+                            <Text style={(pending===false)?styles.listSortingButtonTextLeft:styles.listSortingButtonTextRight}>Completed</Text>
                         </TouchableOpacity>
 
                     </View>
@@ -138,6 +142,7 @@ const TodoList = ({ navigation, route }) => {
                     data={todos}
                     renderItem={renderItem}
                     keyExtractor={item => item.body}
+                    
                 />
             </View>
 
@@ -161,30 +166,38 @@ const styles = StyleSheet.create({
         justifyContent: "space-evenly",
         height: 60,
         backgroundColor: "#2246a9",
+        width:"100%",
+        alignItems:"center",
+    },
+    headerUserContain:{
+        flex:1,
+        alignItems:"center",
+        justifyContent:"center",
+        // backgroundColor:"red",
+        display:"flex",
     },
     headerUsernameText: {
         flex: 1,
+        paddingTop:17,
         alignItems: "center",
         justifyContent: "space-evenly",
-        paddingStart: 40,
+        // paddingStart: 40,
         color: "#fff",
         fontSize: 20,
         fontWeight: "500",
     },
     headerAddButton: {
         height: 60,
-        width: 60,
-        marginRight: 30,
+        // minwidth: 60,
+        // marginRight: 30,
         borderRadius: 30,
         alignItems: "center",
         justifyContent: "space-evenly",
     },
     headerAddButtonText: {
-
         color: "#fff",
         fontSize: 40,
         fontWeight: "300",
-
     },
     bodyContainer: {
         alignItems: "center",
@@ -225,9 +238,21 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     listSortingButton: {
-        paddingHorizontal: 40,
+        paddingHorizontal: 30,
+        alignItems:"center",
+        
+        // backgroundColor:"red",
+        // height:"100%",
+    },
+    listSortingButtonTextRight:{
         fontSize: 22,
-        fontWeight: "600",
+        fontWeight: "500",
+    },
+    listSortingButtonTextLeft:{
+        fontSize: 22,
+        fontWeight: "700",
+        // backgroundColor:"grey",
+        color:"#224",
     },
     listcontainer: {
 
